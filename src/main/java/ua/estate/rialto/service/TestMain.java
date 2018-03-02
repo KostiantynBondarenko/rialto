@@ -11,7 +11,7 @@ public class TestMain {
             appCtx.refresh();
 
             ParserNedvigService parserNedvigService = appCtx.getBean(ParserNedvigService.class);
-            parserNedvigService.parser("D:\\Загрузки\\nedvig2102.xls");
+//            parserNedvigService.parser("D:\\Загрузки\\nedvig2102.xls");
 
         }
     }

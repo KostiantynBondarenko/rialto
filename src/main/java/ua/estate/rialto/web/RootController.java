@@ -1,8 +1,10 @@
 package ua.estate.rialto.web;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+@Slf4j
 @Controller
 public class RootController {
 //    @Autowired
@@ -20,13 +22,6 @@ public class RootController {
 //    public String users(Model model) {
 //        model.addAttribute("users", userService.getAll());
 //        return "users";
-//    }
-
-//    @PostMapping("/users")
-//    public String setUser(HttpServletRequest request) {
-//        int userId = Integer.valueOf(request.getParameter("userId"));
-//        AuthorizedUser.setId(userId);
-//        return "redirect:meals";
 //    }
 //
 //    @GetMapping("/meals")

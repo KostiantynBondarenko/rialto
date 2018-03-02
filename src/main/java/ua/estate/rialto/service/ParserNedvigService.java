@@ -20,8 +20,10 @@ public class ParserNedvigService implements ParserService {
         this.sheetParser = sheetParser;
     }
 
-    public void parser (String path) throws IOException {
-        FileInputStream excelFile = new FileInputStream(new File(path));//xlsx, xls
+    @Override
+    public void parser (File file) throws IOException {
+        FileInputStream excelFile = new FileInputStream(file);//xlsx, xls
+//        FileInputStream excelFile = new FileInputStream(new File(path));//xlsx, xls
 
         Iterator<Sheet> sheetIterator = new HSSFWorkbook(excelFile).sheetIterator();
         while (sheetIterator.hasNext()) {
@@ -48,11 +50,8 @@ public class ParserNedvigService implements ParserService {
                     entityList5.stream().forEach(System.out::println);
                     break;
             }
-            System.out.println("LOGGGGGGGG");
-            System.out.println();
-            System.out.println();
-            System.out.println();
-            System.out.println();
         }
+        excelFile.close();
+        file.delete();
     }
 }

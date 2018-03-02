@@ -4,13 +4,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-
-    <!--<bean class="SheetParser" id="sheetParser"/>-->
-
-    <!--<bean class="ParserNedvigService" id="parserNedvigService">-->
-        <!--<property name="sheetParser" ref="sheetParser"/>-->
-    <!--</bean>-->
-
     <import resource="spring-tools.xml"/>
 
     <context:annotation-config/>
