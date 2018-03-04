@@ -18,6 +18,11 @@ public class RootController {
         return "index";
     }
 
+    @GetMapping("/nedvig")
+    public String nedvig() {
+        return "nedvig";
+    }
+
 //    @GetMapping("/users")
 //    public String users(Model model) {
 //        model.addAttribute("users", userService.getAll());

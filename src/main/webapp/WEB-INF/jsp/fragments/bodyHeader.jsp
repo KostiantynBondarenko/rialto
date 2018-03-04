@@ -9,7 +9,6 @@
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <%--<a class="btn btn-info" href="ads"><spring:message code="ads.editor"/></a>--%>
                     <%--<form:form class="navbar-form" action="logout" method="post">--%>
                         <%--<a class="btn btn-info" href="profile"><spring:message code="app.profile"/></a>--%>
                         <%--<button class="btn btn-primary" type="submit">--%>

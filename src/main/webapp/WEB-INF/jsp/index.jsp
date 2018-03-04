@@ -9,12 +9,8 @@
 <div class="jumbotron">
     <div class="container">
         <p/>
-
         <div class="container">
-            <label class="btn btn-default btn-file">
-                <input id="file" type="file" name="file">
-            </label>
-            <input type="button" onclick="uploudFile()" value="отправить" class="btn btn-info"/>
+            <a class="btn btn-lg btn-info" href="nedvig"><spring:message code="ads.nedvig"/></a>
         </div>
         <%--<form method="post" action="addAds" enctype="multipart/form-data">--%>
 
@@ -37,38 +33,4 @@
 </div>
 <jsp:include page="fragments/footer.jsp"/>
 </body>
-<script>
-    function uploudFile() {
-        var file = $("#file");
-        var fileVal = file.val();
-        if (fileVal != null && fileVal != "") {
-            var fileFormat = fileVal.split('.')[1];
-            if (fileFormat != "xls" && fileFormat != "xlsx") {
-                alert("Был передан не zip архив");
-                return;
-            }
-
-            var fd = new FormData;
-            fd.append('file', file.prop('files')[0]);
-
-            $.ajax({
-                url: '/rialto/addAds',
-                type: 'POST',
-                // dataType: "json",
-                cache: false,
-                contentType: false,
-                processData: false,
-                data: fd,
-                success: function () {
-                    alert("Операция поставлена в очередь на место");
-                },
-                error: function () {
-                    alert("2Операция поставлена в очередь на место");
-                },
-            });
-        } else {
-            alert('Файл не выбран');
-        }
-    }
-</script>
 </html>

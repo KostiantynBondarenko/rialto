@@ -23,7 +23,7 @@ public class NedvigController {
     }
 
     @PostMapping(value = "/addAds")
-    public void addAds(@RequestParam("file") MultipartFile fileNedvig) throws IOException {
+    public void addAds(@RequestParam("fileNedvig") MultipartFile fileNedvig) throws IOException {
         if (fileNedvig == null || fileNedvig.isEmpty()) {
             throw new IllegalArgumentException("Empty file");
         }
