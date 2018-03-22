@@ -5,7 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static org.apache.commons.lang3.StringUtils.repeat;
+
 public class Utils {
+    private static final Pattern patternDigital = Pattern.compile(".*[\\d]+.*");
+
     /**
      * Конвертирует лист массивов в строковую таблицу
      *
@@ -74,7 +78,7 @@ public class Utils {
         sepSize = (sepSize + (maxLenCols.size() * 3)) - 1;
 
         // формирование таблицы
-        sb.append("\n ").append(repeatStr("_", sepSize)).append("\n");
+        sb.append("\n ").append(repeat("_", sepSize)).append("\n");
         for (int i = 0; i < rowsStr.size(); i++) {
             sb.append("| ");
             for (int j = 0; j < maxLenCols.size(); j++) {
@@ -82,33 +86,26 @@ public class Utils {
                 String str = j >= rowsStr.get(i).length ? defaultValue : rowsStr.get(i)[j];
                 int spaceSize = maxLenCols.get(j) - str.length();
                 if (firstIsHeader && i == 0) {
-                    sb.append(repeatStr(" ", spaceSize / 2));
+                    sb.append(repeat(" ", spaceSize / 2));
                     spaceSize -= spaceSize / 2;
                 }
-                sb.append(str).append(repeatStr(" ", spaceSize)).append(" | ");
+                sb.append(str).append(repeat(" ", spaceSize)).append(" | ");
             }
             if (i != rowsStr.size() - 1) {
                 sb.append("\n|");
                 for (int k = 0; k < maxLenCols.size(); k++) {
-                    sb.append(repeatStr(firstIsHeader && i == 0 ? "_" : "-", maxLenCols.get(k) + 2));
+                    sb.append(repeat(firstIsHeader && i == 0 ? "_" : "-", maxLenCols.get(k) + 2));
                     if (k != maxLenCols.size() - 1) sb.append(firstIsHeader && i == 0 ? "|" : "+");
                 }
                 sb.append("|\n");
             }
         }
-        sb.append("\n ").append(repeatStr("\u00AF", sepSize)).append(" \n");
+        sb.append("\n ").append(repeat("\u00AF", sepSize)).append(" \n");
 
         return sb.toString();
     }
 
-    public static String repeatStr(String strBit, int count) {
-        if (count <= 0) return "";
-
-        StringBuilder sb = new StringBuilder(count);
-        for (int i = 0; i < count; i++) {
-            sb.append(strBit);
-        }
-
-        return sb.toString();
+    public static boolean containsDigital(String str) {
+        return str != null && patternDigital.matcher(str).matches();
     }
 }

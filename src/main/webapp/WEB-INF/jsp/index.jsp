@@ -10,7 +10,7 @@
     <div class="container">
         <p/>
         <div class="container">
-            <a class="btn btn-lg btn-info" href="nedvig"><spring:message code="ads.nedvig"/></a>
+            <a class="btn btn-lg btn-info" href="ads"><spring:message code="ads.page"/></a>
         </div>
         <%--<form method="post" action="addAds" enctype="multipart/form-data">--%>
 

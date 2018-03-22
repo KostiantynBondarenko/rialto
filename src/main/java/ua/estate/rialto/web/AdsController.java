@@ -6,36 +6,36 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
-import ua.estate.rialto.service.ParserService;
+import ua.estate.rialto.service.SaveFromExcelService;
 
 import java.io.File;
 import java.io.IOException;
 
 @Slf4j
 @RestController
-public class NedvigController {
+public class AdsController {
     private static final long MAX_SIZE_FILE = 7 * 1024 * 1024;    // 7 MB more information in spring-mvc.xml
 
-    private final ParserService parserService;
+    private final SaveFromExcelService saveFromExcelService;
 
-    public NedvigController(ParserService parserService) {
-        this.parserService = parserService;
+    public AdsController(SaveFromExcelService saveFromExcelService) {
+        this.saveFromExcelService = saveFromExcelService;
     }
 
-    @PostMapping(value = "/addAds")
-    public void addAds(@RequestParam("fileNedvig") MultipartFile fileNedvig) throws IOException {
-        if (fileNedvig == null || fileNedvig.isEmpty()) {
+    @PostMapping(value = "/uploudFile")
+    public void addAds(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("Empty file");
         }
-        String fileName = fileNedvig.getOriginalFilename();
+        String fileName = file.getOriginalFilename();
         if (!fileName.endsWith("xls") && !fileName.endsWith("xlsx")) {
             throw new IllegalArgumentException("Bad file format");
         }
-        if (fileNedvig.getSize() > MAX_SIZE_FILE) {
+        if (file.getSize() > MAX_SIZE_FILE) {
             throw new MaxUploadSizeExceededException(MAX_SIZE_FILE);
         }
-        File convFile = File.createTempFile("tempFileNedvig", "xlsx");
-        fileNedvig.transferTo(convFile);
-        parserService.parser(convFile);
+        File convFile = File.createTempFile("tempFile", "xlsx");
+        file.transferTo(convFile);
+        saveFromExcelService.save(convFile, ex -> log.error("Error", ex));
     }
 }

@@ -16,7 +16,7 @@
             diskExpiryThreadIntervalSeconds="120"
             memoryStoreEvictionPolicy="LRU"/>
 
-    <cache name="users"
+    <cache name="agents"
            timeToLiveSeconds="60"
            maxElementsInMemory="1000"
            eternal="false"
@@ -26,7 +26,7 @@
            diskExpiryThreadIntervalSeconds="1"
            memoryStoreEvictionPolicy="LRU"/>
 
-    <cache name="ua.estate.rialto.model.User"
+    <cache name="ua.estate.rialto.model.Agent"
            maxElementsInMemory="25000"/>
 
 </ehcache>

@@ -5,19 +5,25 @@ import org.hibernate.Hibernate;
 import org.springframework.data.domain.Persistable;
 import ua.estate.rialto.util.json.JsonUtil;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 
+/**
+ * Do not manipulate new (transient) entries in HashSet/HashMap without overriding hashCode
+ * http://stackoverflow.com/questions/5031614
+ */
 @MappedSuperclass
+
+// http://stackoverflow.com/questions/594597/hibernate-annotations-which-is-better-field-or-property-access
 @Access(AccessType.FIELD)
 @Setter
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class AbstractBaseEntity implements Persistable<Integer> {
     @Id
+    @SequenceGenerator(name = "global_seq", sequenceName = "global_seq", allocationSize = 1, initialValue = 10000)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // PROPERTY access for id due to bug: https://hibernate.atlassian.net/browse/HHH-3718
     @Access(value = AccessType.PROPERTY)
     private Integer id; // ид сущности
 

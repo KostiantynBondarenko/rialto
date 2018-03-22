@@ -1,5 +1,5 @@
-function uploudNedvig() {
-    var file = $("#fileNedvig");
+function uploudFile() {
+    var file = $("#file");
     var fileVal = file.val();
     if (fileVal != null && fileVal != "") {
         var fileFormat = fileVal.split('.')[1];
@@ -8,16 +8,16 @@ function uploudNedvig() {
             return;
         }
 
-        var fileNedvig = file.prop('files')[0];
-        if (fileNedvig.size > 7 * 1024 * 1024) {
+        var fileUpload = file.prop('files')[0];
+        if (fileUpload.size > 7 * 1024 * 1024) {
             alert(i18n["file.size.err"]);
             return;
         }
         var formData = new FormData;
-        formData.append('fileNedvig', fileNedvig);
+        formData.append('file', fileUpload);
 
         $.ajax({
-            url: '/rialto/addAds',
+            url: '/rialto/uploudFile',
             type: 'POST',
             cache: false,
             contentType: false,

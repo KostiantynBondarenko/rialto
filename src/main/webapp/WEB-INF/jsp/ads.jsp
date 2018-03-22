@@ -5,7 +5,7 @@
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
-<script type="text/javascript" src="resources/js/nedvig.js" defer></script>
+<script type="text/javascript" src="resources/js/ads.js" defer></script>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <div class="jumbotron">
     <div class="container">
@@ -13,9 +13,9 @@
 
         <div class="container">
             <label class="btn btn-default btn-file">
-                <input id="fileNedvig" type="file">
+                <input id="file" type="file">
             </label>
-            <input type="button" onclick="uploudNedvig()" value=<spring:message code="ads.send"/> class="btn btn-info"/>
+            <input type="button" onclick="uploudFile()" value=<spring:message code="ads.send"/> class="btn btn-info"/>
         </div>
         <%--<form method="post" action="addAds" enctype="multipart/form-data">--%>
 

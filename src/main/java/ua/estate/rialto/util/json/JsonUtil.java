@@ -15,7 +15,7 @@ import static ua.estate.rialto.util.json.JacksonObjectMapper.getPrettyWriter;
  */
 public class JsonUtil {
 
-    // получить объект из json. Пример передачи typeReference: new TypeReference<List<Realtor>>(){}
+    // получить объект из json. Пример передачи typeReference: new TypeReference<List<Agent>>(){}
     public static <T> T fromJson(String json, TypeReference<T> typeReference) {
         try {
             return getMapper().readValue(json, typeReference);

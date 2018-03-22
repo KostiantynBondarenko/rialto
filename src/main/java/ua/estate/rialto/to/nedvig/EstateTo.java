@@ -8,11 +8,11 @@ import ua.estate.rialto.util.json.JsonUtil;
 import java.time.LocalDate;
 
 @ExcelObject(parseType = ParseType.ROW, start = 4)
-public class Estate {
+public class EstateTo {
     @ExcelField(position = 1)
     private String id; // внешний id
     @ExcelField(position = 2)
-    private String region; // область
+    private String district; // область
     @ExcelField(position = 3)
     private String address; // адрес
     @ExcelField(position = 4)

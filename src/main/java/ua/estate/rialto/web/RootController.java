@@ -18,9 +18,9 @@ public class RootController {
         return "index";
     }
 
-    @GetMapping("/nedvig")
-    public String nedvig() {
-        return "nedvig";
+    @GetMapping("/ads")
+    public String ads() {
+        return "ads";
     }
 
 //    @GetMapping("/users")
