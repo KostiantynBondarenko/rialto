@@ -11,6 +11,8 @@ import ua.estate.rialto.util.json.JsonUtil;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -34,25 +36,33 @@ public class Agent implements Persistable<Integer>{
     @Access(value = AccessType.PROPERTY)
     private Integer id;
 
+    @Size(max = 20)
     @Column(name = "name")
     protected String name;
 
+    @Size(max = 20)
     @Column(name = "surname")
     protected String surname; // фамилмя
 
+    @Size(max = 20)
     @Column(name = "patronymic")
     protected String patronymic; // отчество
 
-    @Column(name = "registered", nullable = false, columnDefinition = "timestamp default now()")
     @NotNull
+    @Column(name = "registered", nullable = false, columnDefinition = "timestamp default now()")
     private Date registered = new Date(); // дата регистрации
 
     @Column(name = "cheater", nullable = false, columnDefinition = "bool default false")
     private boolean cheater = false; // является мошенником
 
+    @NotNull
+    @Size(min=9,max=13)
+    @Pattern(regexp="([+380][0-9]{12}|[0][0-9]{9})")
     @Column(name = "phone")
     private String phone; // телефон
 
+    @Size(min=9,max=13)
+    @Pattern(regexp="(^$|[+380][0-9]{12}|[0][0-9]{9})")
     @Column(name = "add_phone")
     private String addPhone; // дополнительный телефон
 

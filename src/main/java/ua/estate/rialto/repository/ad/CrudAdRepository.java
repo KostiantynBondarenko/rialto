@@ -1,16 +1,16 @@
-package ua.estate.rialto.repository.flat;
+package ua.estate.rialto.repository.ad;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
-import ua.estate.rialto.model.Flat;
+import ua.estate.rialto.model.Ad;
 
 @Transactional(readOnly = true)
-public interface CrudFlatRepository extends JpaRepository<Flat, Integer> {
+public interface CrudAdRepository<T extends Ad> extends JpaRepository<T, Integer> {
 
     @Override
-    Flat findOne(Integer id);
+    T findOne(Integer id);
 
     @Override
     @Transactional
-    Flat save(Flat agent);
+    T save(Ad ad);
 }

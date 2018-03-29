@@ -5,7 +5,7 @@
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
-<script type="text/javascript" src="resources/js/ads.js" defer></script>
+<script type="text/javascript" src="resources/js/crud_ads.js" defer></script>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <div class="jumbotron">
     <div class="container">

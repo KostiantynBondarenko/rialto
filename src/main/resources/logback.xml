@@ -5,7 +5,7 @@
     <jmxConfigurator/>
 
     <appender name="file" class="ch.qos.logback.core.FileAppender">
-        <file>log/rialto.log</file>
+        <file>G:\java\project\rialto\log\rialto.log</file>
 
         <encoder>
             <charset>UTF-8</charset>

@@ -36,6 +36,6 @@ public class AdsController {
         }
         File convFile = File.createTempFile("tempFile", "xlsx");
         file.transferTo(convFile);
-        saveFromExcelService.save(convFile, ex -> log.error("Error", ex));
+        saveFromExcelService.parseAndSave(convFile, ex -> log.error("Error", ex));
     }
 }

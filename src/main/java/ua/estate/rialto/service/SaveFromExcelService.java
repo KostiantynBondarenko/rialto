@@ -6,5 +6,5 @@ import java.util.function.Consumer;
 
 public interface SaveFromExcelService {
 
-    void save(File file, Consumer<Exception> errorHandler) throws IOException;
+    void parseAndSave(File file, Consumer<Exception> errorHandler) throws IOException;
 }

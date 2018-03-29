@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Range;
@@ -17,12 +19,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Pojo для хранения объявления
+ * базовое pojo хранения объявления
  *
  * @author kostia
  */
 // http://stackoverflow.com/questions/594597/hibernate-annotations-which-is-better-field-or-property-access
 @Access(AccessType.FIELD)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @MappedSuperclass
 @Setter @Getter
 @NoArgsConstructor
@@ -35,94 +38,92 @@ public abstract class Ad implements Persistable<Integer>{
     @Access(value = AccessType.PROPERTY)
     public Integer id; // идентификатор объявления
 
+    @Size(max = 20)
     @Column(name = "outside_id")
     private String outsideId; // внешний идентификатор объявления
 
-    @Column(name = "ad_type")
     @NotNull
+    @Column(name = "ad_type")
+    @Enumerated(EnumType.STRING)
     private AdType adType; // тип объявления
 
     @Column(name = "active", nullable = false, columnDefinition = "bool default true")
     private boolean active = true; // активно
 
-    @Column(name = "city")
     @Size(max = 20)
+    @Column(name = "city")
     private String city; // город
 
-    @Column(name = "district")
     @Size(max = 50)
+    @Column(name = "district")
     private String district; // район
 
-    @Column(name = "street")
     @Size(max = 50)
+    @Column(name = "street")
     private String street; // улица
 
-    @Column(name = "address")
     @Size(max = 20)
+    @Column(name = "address")
     private String address; // адрес
 
-    @Column(name = "count_room")
-    @Max(50)
-    private Integer countRoom; // количество комнат
-
-    @Column(name = "floor")
     @Range(min = 0, max = 100)
-    private Integer floor; // этаж
+    @Column(name = "count_floor")
+    private Integer countFloor; // количество этажей
 
-    @Column(name = "area", precision=7, scale=2)
     @Digits(integer=9, fraction=2)
+    @Column(name = "area", precision=7, scale=2)
     private BigDecimal area; // площадь
 
     @Column(name = "measure_of_area")
-    @Size(max = 25)
-    private String measureOfArea; // единицы измерения площади
+    @Enumerated(EnumType.STRING)
+    private Measures measureOfArea; // единицы измерения площади
 
-    @Column(name = "material")
     @Size(max = 50)
+    @Column(name = "material")
     private String material; // материал
 
-    @Column(name = "price", precision=7, scale=2)
     @Digits(integer=9, fraction=2)
+    @Column(name = "price", precision=7, scale=2)
     private BigDecimal price; // цена
 
     @Column(name = "currency")
+    @Enumerated(EnumType.STRING)
     private Currency currency; // валюта
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agent_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @NotNull
     private Agent agent; // представитель
 
     @Column(name = "agent_is_owner")
     private Boolean agentIsOwner; // является собственником объекта
 
-    @Column(name = "creation_dt", nullable = false, columnDefinition = "timestamp default now()")
     @NotNull
+    @Column(name = "creation_dt", nullable = false, columnDefinition = "timestamp default now()")
     private LocalDateTime creationDate = LocalDateTime.now(); // дата создания объявления
 
-    @Column(name = "change_dt", nullable = false, columnDefinition = "timestamp default now()")
     @NotNull
+    @Column(name = "change_dt", nullable = false, columnDefinition = "timestamp default now()")
     private LocalDateTime changeDate = LocalDateTime.now(); // дата изменения
 
-    @Column(name = "description")
     @Size(max = 500)
+    @Column(name = "description")
     private String description; // описание
 //    private HashSet<URL> urlAdvertisement; // ссылки на объявления
 //    private Set<URL> urlPhoto; // ссылка на фото
 
 
-    public Ad(String outsideId, AdType adType, String city, String district, String street, String address, Integer countRoom,
-              Integer floor, BigDecimal area, String measureOfArea, String material, BigDecimal price, Currency currency,
-              Agent agent, Boolean agentIsOwner, String description) {
+    public Ad(String outsideId, AdType adType, String city, String district, String street, String address,
+              Integer countFloor, BigDecimal area, Measures measureOfArea, String material, BigDecimal price, Currency currency,
+              Agent agent, Boolean agentIsOwner, LocalDateTime creationDate, String description) {
         this.outsideId = outsideId;
         this.adType = adType;
         this.city = city;
         this.district = district;
         this.street = street;
         this.address = address;
-        this.countRoom = countRoom;
-        this.floor = floor;
+        this.countFloor = countFloor;
         this.area = area;
         this.measureOfArea = measureOfArea;
         this.material = material;
@@ -130,6 +131,7 @@ public abstract class Ad implements Persistable<Integer>{
         this.currency = currency;
         this.agent = agent;
         this.agentIsOwner = agentIsOwner;
+        this.creationDate = creationDate;
         this.description = description;
     }
 

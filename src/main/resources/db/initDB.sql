@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS user_roles;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS flats;
+DROP TABLE IF EXISTS estates;
 DROP TABLE IF EXISTS agents;
 
 DROP SEQUENCE IF EXISTS user_seq;
@@ -45,7 +46,7 @@ CREATE TABLE agents (
 CREATE UNIQUE INDEX agents_unique_phone_idx ON agents (phone);
 CREATE INDEX agents_add_phone_idx ON agents (add_phone);
 
--- таблица с объявлениями
+-- таблица с объявлениями (квартиры)
 CREATE TABLE flats (
   id              INTEGER   PRIMARY KEY DEFAULT nextval('ad_seq'),
   agent_id        INTEGER            NOT NULL,
@@ -58,16 +59,51 @@ CREATE TABLE flats (
   address         VARCHAR,
   count_room      INTEGER,
   floor           INTEGER,
+  count_floor     INTEGER,
   area            NUMERIC,
+  live_area       NUMERIC,
+  kitchen_area    NUMERIC,
   measure_of_area VARCHAR,
   material        VARCHAR,
   price           NUMERIC,
   currency        VARCHAR,
   agent_is_owner  BOOL,
+  balcony         BOOL,
   creation_dt     TIMESTAMP DEFAULT now()  NOT NULL,
   change_dt       TIMESTAMP DEFAULT now()  NOT NULL,
   description     TEXT,
   FOREIGN KEY (agent_id) REFERENCES agents (id) ON DELETE CASCADE
 );
-CREATE INDEX ads_agent_idx ON flats (agent_id);
-CREATE UNIQUE INDEX ads_unique_outside_id_idx ON flats (outside_id);
+CREATE INDEX flats_agent_idx ON flats (agent_id);
+CREATE UNIQUE INDEX flats_unique_outside_id_idx ON flats (outside_id);
+
+-- таблица с объявлениями (недвижимость)
+CREATE TABLE estates (
+  id                    INTEGER   PRIMARY KEY DEFAULT nextval('ad_seq'),
+  agent_id              INTEGER            NOT NULL,
+  outside_id            VARCHAR,
+  ad_type               VARCHAR            NOT NULL,
+  appointment           VARCHAR,
+  active                BOOL DEFAULT TRUE  NOT NULL,
+  city                  VARCHAR,
+  district              VARCHAR,
+  street                VARCHAR,
+  address               VARCHAR,
+  count_floor           INTEGER,
+  area                  NUMERIC,
+  measure_of_area       VARCHAR,
+  build_area            NUMERIC,
+  measure_of_build_area VARCHAR,
+  material              VARCHAR,
+  price                 NUMERIC,
+  currency              VARCHAR,
+  agent_is_owner        BOOL,
+  gas                   BOOL,
+  water                 BOOL,
+  creation_dt           TIMESTAMP DEFAULT now()  NOT NULL,
+  change_dt             TIMESTAMP DEFAULT now()  NOT NULL,
+  description           TEXT,
+  FOREIGN KEY (agent_id) REFERENCES agents (id) ON DELETE CASCADE
+);
+CREATE INDEX estates_agent_idx ON estates (agent_id);
+CREATE UNIQUE INDEX estates_unique_outside_id_idx ON estates (outside_id);

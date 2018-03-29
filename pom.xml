@@ -304,6 +304,12 @@
             <version>3.15</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.javaslang</groupId>
+            <artifactId>javaslang</artifactId>
+            <version>2.0.4</version>
+        </dependency>
+
         <!-- Apache Commons FileUpload -->
         <dependency>
             <groupId>commons-fileupload</groupId>
