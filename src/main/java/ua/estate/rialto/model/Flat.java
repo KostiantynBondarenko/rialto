@@ -4,7 +4,6 @@ package ua.estate.rialto.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Range;
 import ua.estate.rialto.util.json.JsonUtil;
 
 import javax.persistence.Column;
@@ -25,9 +24,11 @@ public class Flat extends Ad {
     @Column(name = "count_room")
     private Integer countRoom; // количество комнат
 
-    @Range(min = 0, max = 100)
-    @Column(name = "floor")
-    private Integer floor; // этаж
+    @Column(name = "furniture")
+    private Boolean furniture; // мебель
+
+    @Column(name = "appliances")
+    private Boolean appliances; // бытовая техника
 
     @Digits(integer=9, fraction=2)
     @Column(name = "live_area", precision=7, scale=2)
@@ -44,13 +45,22 @@ public class Flat extends Ad {
                 Integer countRoom, Integer countFloor, Integer floor, BigDecimal area, Measures measureOfArea,
                 BigDecimal liveArea, BigDecimal kitchenArea, String material, BigDecimal price, Boolean balcony,
                 Currency currency, Agent agent, Boolean agentIsOwner, LocalDateTime creationDate, String description) {
-        super(outsideId, adType, city, district, street, address, countFloor, area, measureOfArea, material, price,
+        super(outsideId, adType, city, district, street, address, null, countFloor, floor, area, measureOfArea, material, price,
                 currency, agent, agentIsOwner, creationDate, description);
         this.countRoom = countRoom;
-        this.floor = floor;
         this.liveArea = liveArea;
         this.kitchenArea = kitchenArea;
         this.balcony = balcony;
+    }
+
+    public Flat(String outsideId, AdType adType, String city, String district, String street, String address, String appointment,
+                Integer countRoom, Integer countFloor, Integer floor, Boolean furniture, Boolean appliances, BigDecimal price,
+                Currency currency, Agent agent, Boolean agentIsOwner, LocalDateTime creationDate, String description) {
+        super(outsideId, adType, city, district, street, address, appointment, countFloor, floor, null, null, null,
+                price, currency, agent, agentIsOwner, creationDate, description);
+        this.countRoom = countRoom;
+        this.furniture = furniture;
+        this.appliances = appliances;
     }
 
     @Override

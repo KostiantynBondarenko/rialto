@@ -1,5 +1,6 @@
 package ua.estate.rialto.to.nedvig;
 
+import lombok.Getter;
 import ua.estate.rialto.util.excelparser.annotations.ExcelField;
 import ua.estate.rialto.util.excelparser.annotations.ExcelObject;
 import ua.estate.rialto.util.excelparser.annotations.ParseType;
@@ -7,6 +8,7 @@ import ua.estate.rialto.util.json.JsonUtil;
 
 import java.time.LocalDate;
 
+@Getter
 @ExcelObject(parseType = ParseType.ROW, start = 4)
 public class RentaFlatTo {
     @ExcelField(position = 1)
@@ -24,9 +26,9 @@ public class RentaFlatTo {
     @ExcelField(position = 7)
     private Integer countFloor; // количество этажей
     @ExcelField(position = 8)
-    private Integer hasFurniture; // мебель
+    private Integer furniture; // мебель
     @ExcelField(position = 9)
-    private Integer hasAppliances; // бытовая техника
+    private Integer appliances; // бытовая техника
     @ExcelField(position = 10)
     private String price; // цена
     @ExcelField(position = 11)
@@ -42,6 +44,6 @@ public class RentaFlatTo {
 
     @Override
     public String toString() {
-        return JsonUtil.toPrettyJson(this);
+        return JsonUtil.toJson(this);
     }
 }

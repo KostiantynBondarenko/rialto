@@ -48,6 +48,6 @@ public class EstateTo {
 
     @Override
     public String toString() {
-        return JsonUtil.toPrettyJson(this);
+        return JsonUtil.toJson(this);
     }
 }

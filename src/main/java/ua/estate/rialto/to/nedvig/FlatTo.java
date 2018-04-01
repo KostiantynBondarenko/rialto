@@ -52,6 +52,6 @@ public class FlatTo {
 
     @Override
     public String toString() {
-        return JsonUtil.toPrettyJson(this);
+        return JsonUtil.toJson(this);
     }
 }

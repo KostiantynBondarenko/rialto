@@ -66,9 +66,17 @@ public abstract class Ad implements Persistable<Integer>{
     @Column(name = "address")
     private String address; // адрес
 
+    @Size(max = 20)
+    @Column(name = "appointment")
+    private String appointment;  // назначение
+
     @Range(min = 0, max = 100)
     @Column(name = "count_floor")
     private Integer countFloor; // количество этажей
+
+    @Range(min = 0, max = 100)
+    @Column(name = "floor")
+    private Integer floor; // этаж
 
     @Digits(integer=9, fraction=2)
     @Column(name = "area", precision=7, scale=2)
@@ -114,8 +122,8 @@ public abstract class Ad implements Persistable<Integer>{
 //    private Set<URL> urlPhoto; // ссылка на фото
 
 
-    public Ad(String outsideId, AdType adType, String city, String district, String street, String address,
-              Integer countFloor, BigDecimal area, Measures measureOfArea, String material, BigDecimal price, Currency currency,
+    public Ad(String outsideId, AdType adType, String city, String district, String street, String address, String appointment,
+              Integer countFloor, Integer floor, BigDecimal area, Measures measureOfArea, String material, BigDecimal price, Currency currency,
               Agent agent, Boolean agentIsOwner, LocalDateTime creationDate, String description) {
         this.outsideId = outsideId;
         this.adType = adType;
@@ -123,7 +131,9 @@ public abstract class Ad implements Persistable<Integer>{
         this.district = district;
         this.street = street;
         this.address = address;
+        this.appointment = appointment;
         this.countFloor = countFloor;
+        this.floor = floor;
         this.area = area;
         this.measureOfArea = measureOfArea;
         this.material = material;

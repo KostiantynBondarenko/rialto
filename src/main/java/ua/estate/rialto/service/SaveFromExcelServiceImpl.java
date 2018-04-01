@@ -20,8 +20,6 @@ import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.*;
@@ -42,31 +40,28 @@ public class SaveFromExcelServiceImpl implements SaveFromExcelService {
     }
 
     @Override
-    public void parseAndSave (File file, Consumer<Exception> errorHandler) throws IOException {
+    public void parseAndSave (File file) throws IOException {
         FileInputStream excelFile = null; //xlsx, xls
 
         try {
             excelFile = new FileInputStream(file);
-
             Iterator<Sheet> sheetIterator = new HSSFWorkbook(excelFile).sheetIterator();
             while (sheetIterator.hasNext()) {
-                Class classObj = null;
                 Sheet sheet = sheetIterator.next();
                 switch (sheet.getSheetName()) {
                     case "Flat":
-                        saveFlats(sheet, errorHandler);
+                        saveFlats(sheet, FlatTo.class);
+                        break;
+                    case "RentaFLT":
+                        saveFlats(sheet, RentaFlatTo.class);
                         break;
                     case "Estate":
-                        saveEstate(sheet, errorHandler);
+                        saveEstate(sheet, EstateTo.class);
                         break;
-                    case "Land2"://убрать 2
-                        classObj = LandTo.class;
+                    case "RentaEST":
+                        saveEstate(sheet, RentaEstateTo.class);
                         break;
-                    case "RentaFLT2":
-                        classObj = RentaFlatTo.class;
-                        break;
-                    case "RentaEST2":
-                        classObj = RentaEstateTo.class;
+                    case "Land2"://убрать 2 (LandTo.class)
                         break;
                 }
             }
@@ -81,21 +76,22 @@ public class SaveFromExcelServiceImpl implements SaveFromExcelService {
     /*
      * Save entities Flat
      **/
-    private void saveFlats(Sheet sheet, Consumer<Exception> errorHandler) {
-        List<FlatTo> flatTos = sheetParser.createEntity(sheet, FlatTo.class,
-                (ex) -> errorHandler.accept(new RuntimeException("Error create entity FlatTo.", ex))); //parse
+    private <T> void saveFlats(Sheet sheet, Class<T> clazz) {
+        log.info("***saveFlats sheet={}, class={}.", sheet.getSheetName(), clazz.getSimpleName());
+        sheetParser
+            .createEntity(sheet, clazz,
+                    (ex) -> log.error("Error create entity Flat.", ex)) //parse
 
-        List<Flat> flats = flatTos.stream()
-                .map(flatTo -> Try
-                        .of(() -> convert(flatTo))
-                        .onFailure((ex) -> errorHandler.accept(new RuntimeException("Error convert entity FlatTo." + flatTo, ex)))
-                        .getOrElse((Flat) null))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList()); //convert
+            .stream()
+            .map(flatTO -> Try
+                    .of(() -> (clazz == FlatTo.class ? convert((FlatTo) flatTO) : convert((RentaFlatTo) flatTO)))
+                    .onFailure((ex) -> log.error("Error convert entity Flat. flatTO={}", flatTO, ex))
+                    .getOrElse((Flat) null)) //convert
 
-        flats.forEach(flat -> Try
-                .of(() -> adRepository.save(flat))
-                .onFailure(ex -> errorHandler.accept(new RuntimeException("Error save entity Flat." + flat, ex))));  //save
+            .filter(Objects::nonNull)
+            .forEach(flat -> Try
+                    .of(() -> adRepository.save(flat))
+                    .onFailure(ex -> log.error("Error save entity Flat. flat={}", flat, ex)));  //save
     }
 
     /*
@@ -105,7 +101,7 @@ public class SaveFromExcelServiceImpl implements SaveFromExcelService {
         String[] fullAddressArr = StringUtils.split(flatTo.getAddress(), ",");
         String address = getAddtess(fullAddressArr);
 
-        return new Flat(
+        Flat flat = new Flat(
                 trimToNull(flatTo.getId()),
                 AdType.SELLING,
                 CITY_DNEPR,
@@ -115,38 +111,72 @@ public class SaveFromExcelServiceImpl implements SaveFromExcelService {
                 flatTo.getCountRoom(),
                 flatTo.getCountFloor(),
                 flatTo.getFloor(),
-                convertArea(flatTo.getAllArea()),
+                strToBigDecimal(flatTo.getAllArea()),
                 Measures.SQ_M,
-                convertArea(flatTo.getLiveArea()),
-                convertArea(flatTo.getKitchenArea()),
+                strToBigDecimal(flatTo.getLiveArea()),
+                strToBigDecimal(flatTo.getKitchenArea()),
                 trimToNull(flatTo.getMaterial()),
-                convertPrice(flatTo.getPrice()),
+                strToBigDecimalWithOrder(flatTo.getPrice(), 2),
                 convertIntToBool(flatTo.getBalcony()),
                 Currency.USD,
                 saveAndGetAgent(flatTo.getPhone(), flatTo.getAddPhone()),
                 isSeller(flatTo.getSeller()),
                 flatTo.getCreationDate().atStartOfDay(),
                 trimToNull(flatTo.getDescription()));
+
+        log.trace("Convert flatTo={} to flat={}", flatTo, flat);
+        return flat;
+    }
+
+    /*
+     * Convert RentaFlatTo to Flat
+     **/
+    private Flat convert(RentaFlatTo rentaFlatTo) {
+        String[] fullAddressArr = StringUtils.split(rentaFlatTo.getAddress(), ",");
+        String address = getAddtess(fullAddressArr);
+
+        Flat flat = new Flat(
+                trimToNull(rentaFlatTo.getId()),
+                "Квартира-суточн".equalsIgnoreCase(trimToNull(rentaFlatTo.getType())) ? AdType.HAND_OVER_BY_DAY : AdType.HAND_OVER,
+                CITY_DNEPR,
+                trimToNull(rentaFlatTo.getDistrict()),
+                getStreet(rentaFlatTo.getAddress(), fullAddressArr, address),
+                address,
+                trimToNull(rentaFlatTo.getType()),
+                rentaFlatTo.getCountRoom(),
+                rentaFlatTo.getCountFloor(),
+                rentaFlatTo.getFloor(),
+                convertIntToBool(rentaFlatTo.getFurniture()),
+                convertIntToBool(rentaFlatTo.getAppliances()),
+                strToBigDecimal(rentaFlatTo.getPrice()),
+                Currency.USD,
+                saveAndGetAgent(rentaFlatTo.getPhone(), rentaFlatTo.getAddPhone()),
+                isSeller(rentaFlatTo.getSeller()),
+                rentaFlatTo.getCreationDate().atStartOfDay(),
+                trimToNull(rentaFlatTo.getDescription()));
+
+        log.trace("Convert rentaFlatTo={} to flat={}", rentaFlatTo, flat);
+        return flat;
     }
 
     /*
      * Save entities Estate
      **/
-    private void saveEstate(Sheet sheet, Consumer<Exception> errorHandler) {
-        List<EstateTo> estateTos = sheetParser.createEntity(sheet, EstateTo.class,
-                (ex) -> errorHandler.accept(new RuntimeException("Error create entity EstateTo.", ex))); //parse
+    private <T> void saveEstate(Sheet sheet, Class<T> clazz) {
+        log.info("***saveEstate sheet={}, class={}.", sheet.getSheetName(), clazz.getSimpleName());
+        sheetParser
+            .createEntity(sheet, clazz, (ex) -> log.error("Error create entity Estate.", ex)) //parse
 
-        List<Estate> estates = estateTos.stream()
-                .map(estateTo -> Try
-                        .of(() -> convert(estateTo))
-                        .onFailure((ex) -> errorHandler.accept(new RuntimeException("Error convert entity EstateTo.", ex)))
-                        .getOrElse((Estate) null))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList()); //convert
+            .stream()
+            .map(estateTO -> Try
+                    .of(() -> (clazz == EstateTo.class ? convert((EstateTo) estateTO) : convert((RentaEstateTo) estateTO)))
+                    .onFailure((ex) -> log.error("Error convert entity Estate. estateTO={}", estateTO, ex))
+                    .getOrElse((Estate) null)) //convert
 
-        estates.forEach(estate -> Try
-                .of(() -> adRepository.save(estate))
-                .onFailure(ex -> errorHandler.accept(new RuntimeException("Error save entity Estate.", ex))));  //save
+            .filter(Objects::nonNull)
+            .forEach(estate -> Try
+                    .of(() -> adRepository.save(estate))
+                    .onFailure(ex -> log.error("Error save entity Estate. estate={}", estate, ex)));  //save
     }
 
     /*
@@ -156,28 +186,66 @@ public class SaveFromExcelServiceImpl implements SaveFromExcelService {
         String[] fullAddressArr = StringUtils.split(estateTo.getAddress(), ",");
         String address = getAddtess(fullAddressArr);
 
-        return new Estate(
-                    trimToNull(estateTo.getId()),
-                    AdType.SELLING,
-                    CITY_DNEPR,
-                    trimToNull(estateTo.getDistrict()),
-                    getStreet(estateTo.getAddress(), fullAddressArr, address),
-                    address,
-                    estateTo.getAppointment(),
-                    estateTo.getCountFloor(),
-                    convertArea(estateTo.getAllArea()),
-                    Measures.HECTARE,
-                    convertArea(estateTo.getBuildArea()),
-                    Measures.SQ_M,
-                    trimToNull(estateTo.getMaterial()),
-                    convertIntToBool(estateTo.getGas()),
-                    convertIntToBool(estateTo.getWater()),
-                    convertPrice(estateTo.getPrice()),
-                    Currency.USD,
-                    saveAndGetAgent(estateTo.getPhone(), estateTo.getAddPhone()),
-                    isSeller(estateTo.getSeller()),
-                    estateTo.getCreationDate().atStartOfDay(),
-                    trimToNull(estateTo.getDescription()));
+        Estate estate = new Estate(
+                trimToNull(estateTo.getId()),
+                AdType.SELLING,
+                CITY_DNEPR,
+                trimToNull(estateTo.getDistrict()),
+                getStreet(estateTo.getAddress(), fullAddressArr, address),
+                address,
+                estateTo.getAppointment(),
+                estateTo.getCountFloor(),
+                strToBigDecimal(estateTo.getAllArea()),
+                Measures.HECTARE,
+                strToBigDecimal(estateTo.getBuildArea()),
+                Measures.SQ_M,
+                trimToNull(estateTo.getMaterial()),
+                convertIntToBool(estateTo.getGas()),
+                convertIntToBool(estateTo.getWater()),
+                strToBigDecimalWithOrder(estateTo.getPrice(), 2),
+                Currency.USD,
+                saveAndGetAgent(estateTo.getPhone(), estateTo.getAddPhone()),
+                isSeller(estateTo.getSeller()),
+                estateTo.getCreationDate().atStartOfDay(),
+                trimToNull(estateTo.getDescription()));
+
+        log.trace("Convert estateTo={} to estate={}", estateTo, estate);
+        return estate;
+    }
+
+    /*
+     * Convert RentaEstateTo to Estate
+     **/
+    private Estate convert(RentaEstateTo rentaEstateTo) {
+        String[] fullAddressArr = StringUtils.split(rentaEstateTo.getAddress(), ",");
+        String address = getAddtess(fullAddressArr);
+
+        BigDecimal area = strToBigDecimal(rentaEstateTo.getAllArea());
+        BigDecimal price = strToBigDecimal(rentaEstateTo.getPrice());
+        if (nonNull(area) && nonNull(price)) {
+            price = area.multiply(price);
+        }
+
+        Estate estate =  new Estate(
+                trimToNull(rentaEstateTo.getId()),
+                AdType.HAND_OVER,
+                CITY_DNEPR,
+                trimToNull(rentaEstateTo.getDistrict()),
+                getStreet(rentaEstateTo.getAddress(), fullAddressArr, address),
+                address,
+                rentaEstateTo.getType(),
+                rentaEstateTo.getFloor(),
+                area,
+                Measures.SQ_M,
+                price,
+                Currency.UAN,
+                saveAndGetAgent(rentaEstateTo.getPhone(), rentaEstateTo.getAddPhone()),
+                isSeller(rentaEstateTo.getSeller()),
+                rentaEstateTo.getCreationDate().atStartOfDay(),
+                trimToNull(rentaEstateTo.getDescription()));
+
+        log.trace("Convert rentaEstateTo={} to estate={}", rentaEstateTo, estate);
+        return estate;
     }
 
     /*
@@ -219,16 +287,16 @@ public class SaveFromExcelServiceImpl implements SaveFromExcelService {
     }
 
     /*
-     * convert 3,2 to 3200
+     * strToBigDecimalWithOrder("3,2", 2) = 3200
      **/
-    private BigDecimal convertPrice(String price) {
-        return isBlank(price) ? null : new BigDecimal(price.trim().replace(",", "") + "00");
+    private BigDecimal strToBigDecimalWithOrder(String price, int order) {
+        return isBlank(price) ? null : new BigDecimal(price.trim().replace(",", "") + repeat("0", order));
     }
 
     /*
-     * convert 70,1 to 70.1
+     * strToBigDecimalWithOrder("70,1") = 70.1
      **/
-    private BigDecimal convertArea(String area) {
+    private BigDecimal strToBigDecimal(String area) {
         return isBlank(area) ? null : new BigDecimal(area.trim().replace(",", "."));
     }
 
